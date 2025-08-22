@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Análise Competitiva SUV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #2ecc71, #3498db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .company-logos {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+        }
+
+        .logo-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .logo-item.main {
+            background: rgba(46, 204, 113, 0.1);
+            border: 2px solid #2ecc71;
+        }
+
+        .logo-item.competitor1 {
+            background: rgba(231, 76, 60, 0.1);
+            border: 2px solid #e74c3c;
+        }
+
+        .logo-item.competitor2 {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid #3498db;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--brand-color);
+        }
+
+        .metric-card.excellent { --brand-color: #2ecc71; }
+        .metric-card.good { --brand-color: #3498db; }
+        .metric-card.average { --brand-color: #f1c40f; }
+        .metric-card.poor { --brand-color: #e74c3c; }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--brand-color);
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--brand-color);
+            border-radius: 4px;
+            width: 0;
+            animation: progressFill 1.5s ease-out forwards;
+        }
+
+        .swot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .swot-quadrant {
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        .swot-quadrant.strengths {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .swot-quadrant.weaknesses {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .swot-quadrant.opportunities {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .swot-quadrant.threats {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .swot-quadrant h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .swot-list {
+            list-style: none;
+        }
+
+        .swot-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .w5h2-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .w5h2-card {
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        .w5h2-card.what { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .w5h2-card.why { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .w5h2-card.who { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .w5h2-card.where { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .w5h2-card.how { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .w5h2-card.howmuch { background: linear-gradient(135deg, #8b4513, #a0522d); }
+
+        .insights-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .insights-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .complaint-item {
+            background: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .complaint-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .ad-example {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: center;
+            color: #666;
+        }
+
+        .strategy-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid #3498db;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes progressFill {
+            from { width: 0; }
+            to { width: var(--progress-width); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .swot-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .company-logos {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Dashboard de Análise Competitiva</h1>
+            <p>Análise estratégica do mercado de SUVs: Jeep Compass vs. Concorrentes Chineses</p>
+            <div class="company-logos">
+                <div class="logo-item main">
+                    <i class="fas fa-car" style="font-size: 2rem; color: #2ecc71;"></i>
+                    <strong>Jeep Compass T270</strong>
+                    <small>Empresa Principal</small>
+                </div>
+                <div class="logo-item competitor1">
+                    <i class="fas fa-bolt" style="font-size: 2rem; color: #e74c3c;"></i>
+                    <strong>BYD Song Pro</strong>
+                    <small>Concorrente 1</small>
+                </div>
+                <div class="logo-item competitor2">
+                    <i class="fas fa-leaf" style="font-size: 2rem; color: #3498db;"></i>
+                    <strong>Haval H6 HEV</strong>
+                    <small>Concorrente 2</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('ads')">
+                <i class="fas fa-bullhorn"></i> Análise de Anúncios
+            </button>
+            <button class="tab-button" onclick="showTab('complaints')">
+                <i class="fas fa-exclamation-triangle"></i> Reclame Aqui
+            </button>
+            <button class="tab-button" onclick="showTab('swot')">
+                <i class="fas fa-crosshairs"></i> Análise SWOT
+            </button>
+            <button class="tab-button" onclick="showTab('5w2h')">
+                <i class="fas fa-question-circle"></i> Análise 5W2H
+            </button>
+        </div>
+
+        <!-- ABA 1: ANÁLISE DE ANÚNCIOS -->
+        <div id="ads" class="tab-content active">
+            <div class="content-card">
+                <h2><i class="fas fa-bullhorn"></i> Análise de Anúncios Digitais</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card excellent" style="--brand-color: #2ecc71;">
+                        <div class="metric-value">85</div>
+                        <div class="metric-label">Jeep Compass - Performance Digital</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress-width: 85%;"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card good" style="--brand-color: #e74c3c;">
+                        <div class="metric-value">92</div>
+                        <div class="metric-label">BYD Song Pro - Performance Digital</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress-width: 92%;"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card good" style="--brand-color: #3498db;">
+                        <div class="metric-value">88</div>
+                        <div class="metric-label">Haval H6 - Performance Digital</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress-width: 88%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-box">
+                    <h3><i class="fas fa-lightbulb"></i> Insights Estratégicos - Anúncios</h3>
+                    <ul>
+                        <li><strong>BYD Song Pro lidera em investimento digital:</strong> Foco em tecnologia e sustentabilidade com campanhas direcionadas para jovens profissionais.</li>
+                        <li><strong>Jeep Compass:</strong> Estratégia focada em aventura e tradição, mas precisa investir mais em tecnologia.</li>
+                        <li><strong>Haval H6:</strong> Posicionamento custo-benefício com ênfase em híbridos, aproveitando incentivos governamentais.</li>
+                        <li><strong>Oportunidade:</strong> Jeep pode explorar melhor o segmento híbrido e tecnologia conectada.</li>
+                    </ul>
+                </div>
+
+                <div class="strategy-card">
+                    <h4>⚠️ ESTRATÉGIAS FA (Forças + Ameaças)</h4>
+                    <ul>
+                        <li><strong>Fortalecer diferenciação premium:</strong> Usar tradição da marca contra commoditização chinesa</li>
+                        <li><strong>Programa fidelidade intensivo:</strong> Aproveitar base consolidada para reter clientes</li>
+                        <li><strong>Parcerias estratégicas:</strong> Alianças com tech companies para acelerar inovação</li>
+                    </ul>
+                </div>
+
+                <div class="strategy-card">
+                    <h4>🚀 ESTRATÉGIAS DO (Fraquezas + Oportunidades)</h4>
+                    <ul>
+                        <li><strong>Investimento massivo em P&D:</strong> Corrigir gap tecnológico aproveitando incentivos</li>
+                        <li><strong>Plataforma híbrida nacional:</strong> Desenvolver tecnologia própria para reduzir custos</li>
+                        <li><strong>Transformação digital:</strong> Modernizar experiência do cliente end-to-end</li>
+                    </ul>
+                </div>
+
+                <div class="strategy-card">
+                    <h4>🛡️ ESTRATÉGIAS DA (Fraquezas + Ameaças)</h4>
+                    <ul>
+                        <li><strong>Guerra de preços estratégica:</strong> Versões entry-level competitivas</li>
+                        <li><strong>Acelerar time-to-market:</strong> Reduzir ciclo de desenvolvimento de produtos</li>
+                        <li><strong>Aquisições tecnológicas:</strong> Comprar startups de mobilidade e tech automotiva</li>
+                    </ul>
+                </div>
+
+                <div class="insights-box">
+                    <h3><i class="fas fa-calendar-alt"></i> Roadmap Estratégico 2025</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <h4>Q1 2025</h4>
+                            <ul>
+                                <li>Lançamento versão híbrida</li>
+                                <li>Nova plataforma digital</li>
+                                <li>Campanha "Tradição + Inovação"</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <h4>Q2-Q3 2025</h4>
+                            <ul>
+                                <li>Expansão rede híbrida</li>
+                                <li>Parcerias tech</li>
+                                <li>App Jeep Connect</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                            <h4>Q4 2025</h4>
+                            <ul>
+                                <li>Avaliação resultados</li>
+                                <li>Expansão para outros modelos</li>
+                                <li>Estratégia 2026</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 4: ANÁLISE 5W2H -->
+        <div id="5w2h" class="tab-content">
+            <div class="content-card">
+                <h2><i class="fas fa-question-circle"></i> Análise 5W2H - Plano de Ação Estratégico</h2>
+                
+                <div class="w5h2-grid">
+                    <div class="w5h2-card what">
+                        <h3><i class="fas fa-question"></i> O QUÊ?</h3>
+                        <ul>
+                            <li><strong>Objetivo Principal:</strong> Superar competitividade dos SUVs chineses no mercado brasileiro</li>
+                            <li><strong>Metas Específicas:</strong>
+                                <ul>
+                                    <li>Manter liderança em vendas SUV</li>
+                                    <li>Lançar versão híbrida competitiva</li>
+                                    <li>Modernizar tecnologia embarcada</li>
+                                    <li>Fortalecer presença digital</li>
+                                </ul>
+                            </li>
+                            <li><strong>Resultados Esperados:</strong> +15% market share, liderança em híbridos premium</li>
+                        </ul>
+                    </div>
+
+                    <div class="w5h2-card why">
+                        <h3><i class="fas fa-lightbulb"></i> POR QUÊ?</h3>
+                        <ul>
+                            <li><strong>Ameaça Competitiva:</strong> SUVs chineses com tecnologia avançada e preços agressivos</li>
+                            <li><strong>Mudança de Mercado:</strong> Consumidores priorizando sustentabilidade e tecnologia</li>
+                            <li><strong>Oportunidade de Crescimento:</strong> Mercado híbrido em expansão no Brasil</li>
+                            <li><strong>Preservação de Liderança:</strong> Manter posição dominante antes da saturação</li>
+                            <li><strong>Adaptação Regulatória:</strong> Novas leis ambientais favorecem híbridos</li>
+                        </ul>
+                    </div>
+
+                    <div class="w5h2-card who">
+                        <h3><i class="fas fa-users"></i> QUEM?</h3>
+                        <ul>
+                            <li><strong>Liderança Executiva:</strong> CEO e VP Marketing comandarão iniciativa</li>
+                            <li><strong>Equipe P&D:</strong> Engenheiros automotivos e especialistas em híbridos</li>
+                            <li><strong>Marketing Digital:</strong> Agências especializadas em automotivo</li>
+                            <li><strong>Parceiros Estratégicos:</strong> Fornecedores de tecnologia híbrida</li>
+                            <li><strong>Rede de Concessionárias:</strong> Treinamento em vendas de híbridos</li>
+                            <li><strong>Target Primário:</strong> Profissionais 30-45 anos, renda R$8k+</li>
+                        </ul>
+                    </div>
+
+                    <div class="w5h2-card where">
+                        <h3><i class="fas fa-map-marker-alt"></i> ONDE?</h3>
+                        <ul>
+                            <li><strong>Mercado Principal:</strong> Brasil (foco regiões Sul e Sudeste)</li>
+                            <li><strong>Canais Digitais:</strong> 
+                                <ul>
+                                    <li>Google Ads e Facebook/Instagram</li>
+                                    <li>YouTube e TikTok</li>
+                                    <li>Site oficial e marketplace</li>
+                                </ul>
+                            </li>
+                            <li><strong>Pontos Físicos:</strong> 
+                                <ul>
+                                    <li>Concessionárias metropolitanas</li>
+                                    <li>Shopping centers premium</li>
+                                    <li>Eventos automotivos</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="w5h2-card how">
+                        <h3><i class="fas fa-cogs"></i> COMO?</h3>
+                        <ul>
+                            <li><strong>Desenvolvimento Produto:</strong>
+                                <ul>
+                                    <li>Versão Compass Hybrid 4xe</li>
+                                    <li>Sistema infotainment UConnect 5</li>
+                                    <li>Conectividade 5G integrada</li>
+                                </ul>
+                            </li>
+                            <li><strong>Estratégia Marketing:</strong>
+                                <ul>
+                                    <li>Campanha "Futuro Sustentável, Tradição Confiável"</li>
+                                    <li>Influenciadores tech e lifestyle</li>
+                                    <li>Test drives híbridos nas capitais</li>
+                                </ul>
+                            </li>
+                            <li><strong>Distribuição:</strong> Expandir rede para 150 pontos híbridos</li>
+                        </ul>
+                    </div>
+
+                    <div class="w5h2-card howmuch">
+                        <h3><i class="fas fa-dollar-sign"></i> QUANTO?</h3>
+                        <ul>
+                            <li><strong>Investimento Total:</strong> R$ 280 milhões (12 meses)</li>
+                            <li><strong>P&D e Desenvolvimento:</strong> R$ 120 milhões (43%)</li>
+                            <li><strong>Marketing e Comunicação:</strong> R$ 80 milhões (29%)</li>
+                            <li><strong>Expansão Rede:</strong> R$ 50 milhões (18%)</li>
+                            <li><strong>Treinamento e Capacitação:</strong> R$ 20 milhões (7%)</li>
+                            <li><strong>Contingência:</strong> R$ 10 milhões (3%)</li>
+                            <li><strong>ROI Esperado:</strong> 35% em 24 meses</li>
+                            <li><strong>Break-even:</strong> 18 meses</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="insights-box">
+                    <h3><i class="fas fa-rocket"></i> Prioridades por Urgência</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div style="background: #e74c3c; padding: 20px; border-radius: 15px;">
+                            <h4>🔥 ALTA URGÊNCIA (0-3 meses)</h4>
+                            <ul>
+                                <li>Definir especificações Compass Hybrid</li>
+                                <li>Contratar agência de marketing digital</li>
+                                <li>Estabelecer parcerias tecnológicas</li>
+                                <li>Iniciar campanha teaser híbrido</li>
+                                <li>Treinar equipe de vendas</li>
+                            </ul>
+                        </div>
+                        <div style="background: #f39c12; padding: 20px; border-radius: 15px;">
+                            <h4>⚡ MÉDIA URGÊNCIA (3-6 meses)</h4>
+                            <ul>
+                                <li>Desenvolver protótipo híbrido</li>
+                                <li>Implementar UConnect 5</li>
+                                <li>Expandir pontos de venda híbridos</li>
+                                <li>Campanha de lançamento</li>
+                                <li>Programa de test drive nacional</li>
+                            </ul>
+                        </div>
+                        <div style="background: #27ae60; padding: 20px; border-radius: 15px;">
+                            <h4>📈 BAIXA URGÊNCIA (6-12 meses)</h4>
+                            <ul>
+                                <li>Avaliar resultados de vendas</li>
+                                <li>Otimizar estratégias baseadas em data</li>
+                                <li>Expandir para outros modelos</li>
+                                <li>Desenvolver próxima geração</li>
+                                <li>Consolidar liderança híbrida</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy-card">
+                    <h4><i class="fas fa-chart-line"></i> KPIs de Acompanhamento</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div>
+                            <h5>📊 Vendas & Market Share</h5>
+                            <ul>
+                                <li>Unidades vendidas mensais</li>
+                                <li>Market share SUV híbrido</li>
+                                <li>Ticket médio vs. concorrentes</li>
+                                <li>Taxa de conversão test drive</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>💻 Performance Digital</h5>
+                            <ul>
+                                <li>CTR campanhas Google/Meta</li>
+                                <li>CAC (Custo Aquisição Cliente)</li>
+                                <li>Engagement redes sociais</li>
+                                <li>Leads qualificados gerados</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>😊 Satisfação & Brand</h5>
+                            <ul>
+                                <li>NPS (Net Promoter Score)</li>
+                                <li>Brand awareness híbridos</li>
+                                <li>Share of voice vs. chineses</li>
+                                <li>Nota Reclame Aqui</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5>💰 Resultados Financeiros</h5>
+                            <ul>
+                                <li>ROI campanhas marketing</li>
+                                <li>Margem de contribuição</li>
+                                <li>EBITDA incremental</li>
+                                <li>Payback investimentos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-box">
+                    <h3><i class="fas fa-calendar-check"></i> Timeline de Implementação 2025</h3>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                            <div>
+                                <h4>🚀 Janeiro - Março 2025</h4>
+                                <ul>
+                                    <li>✅ Kick-off projeto híbrido</li>
+                                    <li>✅ Seleção agências marketing</li>
+                                    <li>✅ Definição specs técnicas</li>
+                                    <li>✅ Parcerias fornecedores</li>
+                                    <li>✅ Campanha teaser digital</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>⚡ Abril - Junho 2025</h4>
+                                <ul>
+                                    <li>🔄 Desenvolvimento protótipo</li>
+                                    <li>🔄 Testes dinâmicos híbrido</li>
+                                    <li>🔄 Treinamento rede vendas</li>
+                                    <li>🔄 Campanha pre-launch</li>
+                                    <li>🔄 Setup pontos híbridos</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>🎯 Julho - Setembro 2025</h4>
+                                <ul>
+                                    <li>🎉 LANÇAMENTO COMPASS HYBRID</li>
+                                    <li>📺 Campanha 360° massiva</li>
+                                    <li>🚗 Test drives nacionais</li>
+                                    <li>📱 App Jeep Connect</li>
+                                    <li>📊 Monitoramento KPIs</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>📈 Outubro - Dezembro 2025</h4>
+                                <ul>
+                                    <li>📊 Análise resultados</li>
+                                    <li>🔧 Otimizações estratégia</li>
+                                    <li>🎄 Campanha fim de ano</li>
+                                    <li>🎯 Planejamento 2026</li>
+                                    <li>🏆 Consolidação liderança</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Restart animations when tab is shown
+            restartAnimations();
+        }
+
+        function restartAnimations() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                bar.style.animation = 'none';
+                bar.offsetHeight; // Trigger reflow
+                bar.style.animation = 'progressFill 1.5s ease-out forwards';
+            });
+        }
+
+        // Initialize animations when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set progress bar widths dynamically
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.getPropertyValue('--progress-width');
+                if (width) {
+                    bar.style.setProperty('--progress-width', width);
+                }
+            });
+
+            // Start initial animations
+            setTimeout(restartAnimations, 500);
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add hover effects to metric cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+        // Enhanced mobile responsiveness
+        function handleResize() {
+            const container = document.querySelector('.container');
+            if (window.innerWidth <= 768) {
+                container.style.padding = '10px';
+            } else {
+                container.style.padding = '20px';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('load', handleResize);
+
+        // Add loading animation to cards
+        function animateOnScroll() {
+            const cards = document.querySelectorAll('.content-card, .metric-card, .swot-quadrant, .w5h2-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', animateOnScroll);
+    </script>
+</body>
+</html>
+                </div>
+
+                <h3><i class="fas fa-google"></i> Exemplos de Anúncios Google Ads (Simulados)</h3>
+                <div class="ad-example">
+                    <strong>Jeep Compass T270 Turbo</strong><br>
+                    <small>Anúncio • jeep.com.br</small><br>
+                    "O SUV líder em vendas. Motor Turbo 185cv. A partir de R$ 179.990. Configure o seu!"
+                </div>
+                <div class="ad-example">
+                    <strong>BYD Song Pro Híbrido</strong><br>
+                    <small>Anúncio • byd.com.br</small><br>
+                    "SUV Híbrido Plug-in. 30km só no elétrico. Tecnologia chinesa. A partir de R$ 190.000"
+                </div>
+                <div class="ad-example">
+                    <strong>Haval H6 HEV One</strong><br>
+                    <small>Anúncio • gwmmotors.com.br</small><br>
+                    "SUV Híbrido mais vendido. 5 anos de garantia. Tecnologia E-Traction. Confira!"
+                </div>
+
+                <h3><i class="fab fa-meta"></i> Exemplos de Anúncios Meta/Facebook (Simulados)</h3>
+                <div class="ad-example">
+                    <i class="fas fa-video"></i><br>
+                    <strong>Jeep Compass</strong> - Vídeo: "Trilha na Serra"<br>
+                    <small>Engajamento: 15.2K curtidas | 342 comentários</small>
+                </div>
+                <div class="ad-example">
+                    <i class="fas fa-image"></i><br>
+                    <strong>BYD Song Pro</strong> - Carrossel: "Tecnologia que Surpreende"<br>
+                    <small>Engajamento: 23.7K curtidas | 891 compartilhamentos</small>
+                </div>
+                <div class="ad-example">
+                    <i class="fas fa-play-circle"></i><br>
+                    <strong>Haval H6</strong> - Vídeo: "Economia que Impressiona"<br>
+                    <small>Engajamento: 18.3K curtidas | 567 comentários</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: ANÁLISE RECLAME AQUI -->
+        <div id="complaints" class="tab-content">
+            <div class="content-card">
+                <h2><i class="fas fa-exclamation-triangle"></i> Análise de Reclamações - Reclame Aqui</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card good" style="--brand-color: #2ecc71;">
+                        <div class="metric-value">7.8</div>
+                        <div class="metric-label">Jeep Compass - Nota Geral</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress-width: 78%;"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card average" style="--brand-color: #f1c40f;">
+                        <div class="metric-value">6.2</div>
+                        <div class="metric-label">BYD Song Pro - Nota Geral</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress-width: 62%;"></div>
+                        </div>
+                    </div>
+                    <div class="metric-card good" style="--brand-color: #3498db;">
+                        <div class="metric-value">7.5</div>
+                        <div class="metric-label">Haval H6 - Nota Geral</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress-width: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-list"></i> Top 10 Reclamações dos Concorrentes</h3>
+
+                <h4 style="color: #e74c3c;"><i class="fas fa-bolt"></i> BYD Song Pro - Principais Fraquezas:</h4>
+                <div class="complaint-item">
+                    <strong>1. Rede de Assistência Técnica Limitada</strong><br>
+                    <small>Poucos pontos de atendimento no interior do país</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>2. Demora na Entrega de Peças</strong><br>
+                    <small>Dependência de importação aumenta tempo de reparo</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>3. Custos de Manutenção Elevados</strong><br>
+                    <small>Peças específicas com preços altos</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>4. Sistema de Infotainment Instável</strong><br>
+                    <small>Falhas no sistema multimídia chinês</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>5. Qualidade dos Acabamentos</strong><br>
+                    <small>Ruídos internos e materiais plásticos</small>
+                </div>
+
+                <h4 style="color: #3498db;"><i class="fas fa-leaf"></i> Haval H6 HEV - Principais Fraquezas:</h4>
+                <div class="complaint-item">
+                    <strong>1. Consumo Real vs. Anunciado</strong><br>
+                    <small>Diferença significativa entre consumo teórico e prático</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>2. Problemas na Transmissão CVT</strong><br>
+                    <small>Trepidações e falhas no câmbio automático</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>3. Software Não Atualizado</strong><br>
+                    <small>Sistema operacional defasado em português</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>4. Atendimento ao Cliente</strong><br>
+                    <small>Demora nas respostas e soluções</small>
+                </div>
+                <div class="complaint-item">
+                    <strong>5. Desvalorização Acelerada</strong><br>
+                    <small>Perda de valor de revenda maior que esperado</small>
+                </div>
+
+                <div class="insights-box">
+                    <h3><i class="fas fa-balance-scale"></i> Comparativo de Fraquezas</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4>Jeep Compass - Fraquezas:</h4>
+                            <ul>
+                                <li>Consumo de combustível alto</li>
+                                <li>Falta de versão híbrida competitiva</li>
+                                <li>Tecnologia menos avançada</li>
+                                <li>Preço elevado nas versões top</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Vantagens Competitivas da Jeep:</h4>
+                            <ul>
+                                <li>✅ Rede de assistência consolidada</li>
+                                <li>✅ Tradição e confiabilidade da marca</li>
+                                <li>✅ Valor de revenda estável</li>
+                                <li>✅ Peças disponíveis nacionalmente</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: ANÁLISE SWOT -->
+        <div id="swot" class="tab-content">
+            <div class="content-card">
+                <h2><i class="fas fa-crosshairs"></i> Matriz SWOT - Jeep Compass vs Concorrentes</h2>
+                
+                <div class="swot-grid">
+                    <div class="swot-quadrant strengths">
+                        <h3><i class="fas fa-plus-circle"></i> FORÇAS</h3>
+                        <ul class="swot-list">
+                            <li><i class="fas fa-check"></i> Marca consolidada no Brasil</li>
+                            <li><i class="fas fa-check"></i> Rede de assistência ampla</li>
+                            <li><i class="fas fa-check"></i> Líder em vendas SUV</li>
+                            <li><i class="fas fa-check"></i> Valor de revenda estável</li>
+                            <li><i class="fas fa-check"></i> Design robusto e aventureiro</li>
+                            <li><i class="fas fa-check"></i> Motor Turbo performático</li>
+                        </ul>
+                    </div>
+
+                    <div class="swot-quadrant weaknesses">
+                        <h3><i class="fas fa-minus-circle"></i> FRAQUEZAS</h3>
+                        <ul class="swot-list">
+                            <li><i class="fas fa-times"></i> Ausência de versão híbrida</li>
+                            <li><i class="fas fa-times"></i> Tecnologia menos avançada</li>
+                            <li><i class="fas fa-times"></i> Consumo elevado de combustível</li>
+                            <li><i class="fas fa-times"></i> Preço alto vs. concorrentes</li>
+                            <li><i class="fas fa-times"></i> Marketing digital limitado</li>
+                            <li><i class="fas fa-times"></i> Inovação tecnológica lenta</li>
+                        </ul>
+                    </div>
+
+                    <div class="swot-quadrant opportunities">
+                        <h3><i class="fas fa-lightbulb"></i> OPORTUNIDADES</h3>
+                        <ul class="swot-list">
+                            <li><i class="fas fa-arrow-up"></i> Crescimento do mercado híbrido</li>
+                            <li><i class="fas fa-arrow-up"></i> Incentivos fiscais para híbridos</li>
+                            <li><i class="fas fa-arrow-up"></i> Demanda por tecnologia conectada</li>
+                            <li><i class="fas fa-arrow-up"></i> Mercado de SUVs em expansão</li>
+                            <li><i class="fas fa-arrow-up"></i> Parcerias tecnológicas</li>
+                            <li><i class="fas fa-arrow-up"></i> Estratégia digital avançada</li>
+                        </ul>
+                    </div>
+
+                    <div class="swot-quadrant threats">
+                        <h3><i class="fas fa-exclamation-triangle"></i> AMEAÇAS</h3>
+                        <ul class="swot-list">
+                            <li><i class="fas fa-bolt"></i> Entrada massiva de SUVs chineses</li>
+                            <li><i class="fas fa-bolt"></i> Preços competitivos dos rivais</li>
+                            <li><i class="fas fa-bolt"></i> Tecnologia superior dos asiáticos</li>
+                            <li><i class="fas fa-bolt"></i> Mudança preferência para híbridos</li>
+                            <li><i class="fas fa-bolt"></i> Regulamentações ambientais</li>
+                            <li><i class="fas fa-bolt"></i> Crise econômica e inflação</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-chess"></i> Estratégias Recomendadas</h3>
+                
+                <div class="strategy-card">
+                    <h4>🎯 ESTRATÉGIAS FO (Forças + Oportunidades)</h4>
+                    <ul>
+                        <li><strong>Lançar versão híbrida Compass:</strong> Usar força da marca para liderar segmento híbrido</li>
+                        <li><strong>Expandir tecnologia conectada:</strong> Aproveitar rede consolidada para oferecer serviços digitais</li>
+                        <li><strong>Marketing premium sustentável:</strong> Posicionar como SUV tradicional com inovação verde</li>
+                    </ul>
